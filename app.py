@@ -11,20 +11,47 @@ st.set_page_config(
 )
 
 # ==============================================================
-# 🔐 STORE LOGIN (STORE ONLY)
+# SESSION STATE (NEW - FOR LOGIN PERSISTENCE)
 # ==============================================================
-st.title("🔐 Store Login")
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
 
-stores = list(st.secrets["stores"].keys())
-selected_store = st.selectbox("Select Store", stores)
-password = st.text_input("Password", type="password")
+if "store_code" not in st.session_state:
+    st.session_state.store_code = None
 
-if password != st.secrets["stores"][selected_store]:
-    st.warning("❌ Incorrect password")
+# ==============================================================
+# 🔐 STORE LOGIN (DISAPPEARS AFTER SUCCESS)
+# ==============================================================
+if not st.session_state.logged_in:
+
+    st.title("🔐 Store Login")
+
+    stores = list(st.secrets["stores"].keys())
+    selected_store = st.selectbox("Select Store", stores)
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if password == st.secrets["stores"][selected_store]:
+            st.session_state.logged_in = True
+            st.session_state.store_code = selected_store
+            st.rerun()
+        else:
+            st.error("❌ Incorrect password")
+
     st.stop()
 
-STORE_CODE = selected_store
-st.success(f"✅ Logged in as {STORE_CODE}")
+# ==============================================================
+# AFTER LOGIN
+# ==============================================================
+STORE_CODE = st.session_state.store_code
+
+# Optional Logout Button (does not affect your logic)
+col1, col2 = st.columns([6,1])
+with col2:
+    if st.button("Logout"):
+        st.session_state.logged_in = False
+        st.session_state.store_code = None
+        st.rerun()
 
 # ==============================================================
 # HEADER
