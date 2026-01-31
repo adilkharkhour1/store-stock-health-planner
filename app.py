@@ -314,25 +314,5 @@ if sales_file and stock_file:
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-    # ==============================================================
-    # STORE LOGIN (STORE ONLY)
-    # ==============================================================
-
-    st.title("🔐 Store Login")
-
-    stores = list(st.secrets["stores"].keys())
-
-    selected_store = st.selectbox("Select Store", stores)
-    password = st.text_input("Password", type="password")
-
-    if password != st.secrets["stores"][selected_store]:
-        st.warning("❌ Incorrect password")
-        st.stop()
-
-    STORE_CODE = selected_store
-    st.success(f"✅ Logged in as {STORE_CODE}")
-
 else:
     st.info("📥 Please upload Sales & Stock Excel files to start analysis.")
-
-st.caption(f"📍 Store: {STORE_CODE}")
