@@ -9,6 +9,7 @@ st.set_page_config(
     page_title="Store Stock Health & Replenishment Planner",
     layout="wide"
 )
+
 # ==============================================================
 # 🔐 STORE LOGIN (STORE ONLY)
 # ==============================================================
@@ -171,11 +172,22 @@ if sales_file and stock_file:
     blocked = blocked.sort_values("Value_At_Risk_MAD", ascending=False)
 
     # ==========================================================
-    # CAPACITY & FEASIBILITY
+    # CAPACITY & FEASIBILITY (AUTO FROM LOGIN)
     # ==========================================================
+    default_capacity = {
+        "MA05": [9437, 7947, 7028, 6673, 476, 414],
+        "MA08": [9914, 8537, 7994, 7087, 137, 920],
+        "MA09": [11098, 10607, 8901, 8062, 1691, 2750],
+        "MA10": [10738, 9285, 7427, 7206, 1642, 1321],
+        "MA16": [10412, 10238, 7200, 6774, 1536, 1500],
+        "MA24": [10344, 10818, 8348, 7666, 106, 1765],
+        "MA27": [13271, 12532, 9892, 8947, 2254, 1876],
+        "MA47": [10539, 9721, 6587, 6187, 137, 1],
+    }
+
     capacity_df = pd.DataFrame({
         "Merch Group": ["BG", "BU", "CK", "CU", "EV", "ST"],
-        "Capacity": [9694, 8429, 7823, 7298, 129, 1294]
+        "Capacity": default_capacity[STORE_CODE]
     })
 
     merch_occ = (
@@ -191,6 +203,8 @@ if sales_file and stock_file:
     merch_occ["Occupancy_After_Push_%"] = (
         (merch_occ["RAYON"] + merch_occ["PCS_To_Push_Today"]) / merch_occ["Capacity"] * 100
     )
+
+    total_capacity = capacity_df["Capacity"].sum()
 
     # ==========================================================
     # 🧩 FRAGMENTATION
